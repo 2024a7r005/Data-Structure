@@ -1,0 +1,246 @@
+#include <stdio.h>
+#include <stdlib.h>
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+struct Node* head = NULL;
+
+struct Node* createNode(int ele) {
+    struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
+    temp->data = ele;
+    temp->next = temp->prev = NULL;
+    return temp;
+}
+
+void insertAtBeginning(int ele) {
+    struct Node* newNode = createNode(ele);
+    if (head == NULL) {
+        head = newNode;
+        head->next = head->prev = head;
+    } else {
+        struct Node* last = head->prev;
+        newNode->next = head;
+        newNode->prev = last;
+        last->next = newNode;
+        head->prev = newNode;
+        head = newNode;
+    }
+    printf("Node inserted at beginning!\n");
+}
+
+void insertAtEnd(int ele) {
+    struct Node* newNode = createNode(ele);
+    if (head == NULL) {
+        head = newNode;
+        head->next = head->prev = head;
+    } else {
+        struct Node* last = head->prev;
+        newNode->next = head;
+        newNode->prev = last;
+        last->next = newNode;
+        head->prev = newNode;
+    }
+    printf("Node inserted at end!\n");
+}
+
+void insertAtPosition(int ele, int pos) {
+    if (pos <= 0) {
+        printf("Invalid position!\n");
+        return;
+    }
+
+    if (pos == 1) {
+        insertAtBeginning(ele);
+        return;
+    }
+
+    struct Node* temp = head;
+    int i = 1;
+
+    while (i < pos - 1 && temp->next != head) {
+        temp = temp->next;
+        i++;
+    }
+
+    if (i == pos - 1) {
+        struct Node* newNode = createNode(ele);
+        newNode->next = temp->next;
+        newNode->prev = temp;
+        temp->next->prev = newNode;
+        temp->next = newNode;
+        printf("Node inserted at position %d!\n", pos);
+    } else {
+        printf("Position out of bounds!\n");
+    }
+}
+
+void deleteFromBeginning() {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+
+    if (head->next == head) {
+        free(head);
+        head = NULL;
+    } else {
+        struct Node* last = head->prev;
+        struct Node* temp = head;
+        head = head->next;
+        last->next = head;
+        head->prev = last;
+        free(temp);
+    }
+    printf("Node deleted from beginning!\n");
+}
+
+void deleteFromEnd() {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+
+    if (head->next == head) {
+        free(head);
+        head = NULL;
+    } else {
+        struct Node* last = head->prev;
+        struct Node* secondLast = last->prev;
+        secondLast->next = head;
+        head->prev = secondLast;
+        free(last);
+    }
+    printf("Node deleted from end!\n");
+}
+
+void deleteFromPosition(int pos) {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+
+    if (pos == 1) {
+        deleteFromBeginning();
+        return;
+    }
+
+    struct Node* temp = head;
+    int i = 1;
+
+    while (i < pos && temp->next != head) {
+        temp = temp->next;
+        i++;
+    }
+
+    if (i == pos) {
+        temp->prev->next = temp->next;
+        temp->next->prev = temp->prev;
+        if (temp == head)
+            head = temp->next;
+        free(temp);
+        printf("Node deleted from position %d!\n", pos);
+    } else {
+        printf("Invalid position!\n");
+    }
+}
+
+void search(int target) {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+
+    struct Node* temp = head;
+    int pos = 1, found = 0;
+
+    do {
+        if (temp->data == target) {
+            printf("Element %d found at position %d\n", target, pos);
+            found = 1;
+            break;
+        }
+        temp = temp->next;
+        pos++;
+    } while (temp != head);
+        printf("Element %d not found in the list!\n", target);
+}
+
+void display() {
+    if (head == NULL) {
+        printf("List is empty!\n");
+        return;
+    }
+
+    struct Node* temp = head;
+    printf("Circular Doubly Linked List: ");
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != head);
+    printf("\n");
+}
+
+int main() {
+    int choice, ele, pos;
+
+    while (1) {
+        printf("\n--- Circular Doubly Linked List Menu ---\n");
+        printf("1. Insert at Beginning\n");
+        printf("2. Insert at End\n");
+        printf("3. Insert at Any Position\n");
+        printf("4. Delete from Beginning\n");
+        printf("5. Delete from End\n");
+        printf("6. Delete from Any Position\n");
+        printf("7. Search Element\n");
+        printf("8. Display List\n");
+        printf("9. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter Element: ");
+                scanf("%d", &ele);
+                insertAtBeginning(ele);
+                break;
+            case 2:
+                printf("Enter Element: ");
+                scanf("%d", &ele);
+                insertAtEnd(ele);
+                break;
+            case 3:
+                printf("Enter Element and Position: ");
+                scanf("%d %d", &ele, &pos);
+                insertAtPosition(ele, pos);
+                break;
+            case 4:
+                deleteFromBeginning();
+                break;
+            case 5:
+                deleteFromEnd();
+                break;
+            case 6:
+                printf("Enter Position to Delete: ");
+                scanf("%d", &pos);
+                deleteFromPosition(pos);
+                break;
+            case 7:
+                printf("Enter Element to Search: ");
+                scanf("%d", &ele);
+                search(ele);
+                break;
+            case 8:
+                display();
+                break;
+            case 9:
+                exit(0);
+            default:
+                printf("Invalid Choice!\n");
+        }
+    }
+
+    return 0;
+}
